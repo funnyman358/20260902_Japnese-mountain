@@ -25,9 +25,9 @@ export function JapanTileMap({
   hrefFor?: (p: Prefecture) => string;
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div>
       <div
-        className="mx-auto grid min-w-[340px] max-w-2xl gap-1"
+        className="mx-auto grid w-full max-w-2xl gap-[3px] sm:gap-1"
         style={{
           gridTemplateColumns: `repeat(${TILE_COLS}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${TILE_ROWS}, minmax(0, 1fr))`,
@@ -43,13 +43,19 @@ export function JapanTileMap({
               key={p}
               href={hrefFor(p)}
               title={`${p} ${prog.climbed}/${prog.total}座 (${Math.round(prog.rate * 100)}%)`}
-              className={`flex flex-col items-center justify-center rounded-[4px] text-center leading-none transition hover:scale-105 ${
+              className={`flex flex-col items-center justify-center overflow-hidden rounded-[4px] text-center leading-none transition hover:scale-105 ${
                 selected === p ? "ring-2 ring-[var(--ink)]" : ""
               }`}
               style={{ gridColumn: pos.col, gridRow: pos.row, ...style }}
             >
-              <span className="text-[9px] font-black sm:text-[11px]">{PREF_SHORT[p]}</span>
-              <span className="text-[8px] font-bold tabular-nums opacity-80 sm:text-[10px]">
+              <span
+                className={`font-black leading-tight sm:text-[11px] ${
+                  PREF_SHORT[p].length > 2 ? "text-[7px]" : "text-[8px]"
+                }`}
+              >
+                {PREF_SHORT[p]}
+              </span>
+              <span className="text-[7px] font-bold leading-tight tabular-nums opacity-80 sm:text-[10px]">
                 {prog.climbed}/{prog.total}
               </span>
             </Link>
