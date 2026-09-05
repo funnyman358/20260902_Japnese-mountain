@@ -93,13 +93,35 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxxx
 
 ## Vercel へのデプロイ
 
-1. [vercel.com/new](https://vercel.com/new) を開く
-2. このリポジトリ（`funnyman358/20260902_japnese-mountain`）をインポート
-3. Framework Preset は自動で **Next.js** が選択されます。設定はそのままで **Deploy**
-4. 完了後に発行される URL をスマホでも開き、ブラウザの「ホーム画面に追加」でアプリとして使えます
+### 方法A: GitHub Actions で自動デプロイ（このリポジトリに設定済み）
 
-環境変数はリポジトリの `.env.production` に含まれているため追加設定は不要です。
+`.github/workflows/deploy.yml` が、push のたびに「データ検証 → 型チェック → Lint → ビルド」を実行し、
+シークレットが設定されていれば続けて Vercel へ本番デプロイします。
+
+1. [vercel.com/account/tokens](https://vercel.com/account/tokens) でトークンを作成
+2. GitHub リポジトリの **Settings → Secrets and variables → Actions → New repository secret** で登録
+
+   | シークレット名 | 必須 | 値 |
+   | --- | --- | --- |
+   | `VERCEL_TOKEN` | 必須 | 1で作成したトークン |
+   | `VERCEL_ORG_ID` | 任意 | 既存の Vercel プロジェクトに紐付ける場合のみ |
+   | `VERCEL_PROJECT_ID` | 任意 | 同上（未設定なら新規プロジェクトが自動作成されます） |
+
+3. 次の push（または Actions タブから手動実行）でデプロイされ、
+   ワークフローのサマリーに本番URLが表示されます
+
+`VERCEL_TOKEN` が未設定の間はデプロイ手順だけがスキップされ、検証ジョブは通常どおり成功します。
+
+### 方法B: Vercel のダッシュボードから取り込む
+
+1. [vercel.com/new](https://vercel.com/new) を開く
+2. このリポジトリ（`funnyman358/20260902_Japnese-mountain`）をインポート
+3. Framework Preset は自動で **Next.js** が選択されます。設定はそのままで **Deploy**
+
+いずれの方法でも、環境変数はリポジトリの `.env.production` に含まれているため追加設定は不要です。
 別の Supabase プロジェクトを使う場合のみ、Vercel の環境変数で上書きしてください。
+
+デプロイ後に発行された URL をスマホでも開き、ブラウザの「ホーム画面に追加」を選ぶとアプリとして使えます。
 
 ## データベース（Supabase）
 

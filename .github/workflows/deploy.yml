@@ -1,0 +1,83 @@
+name: Check & Deploy
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: 検証（データ・型・Lint・ビルド）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 山データの整合性チェック
+        run: npm run validate
+      - name: 型チェック
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: 本番ビルド
+        run: npm run build
+
+  deploy:
+    name: Vercel へデプロイ
+    needs: check
+    runs-on: ubuntu-latest
+    env:
+      # シークレット未設定でもワークフローが赤くならないよう、有無で分岐する
+      HAS_TOKEN: ${{ secrets.VERCEL_TOKEN != '' }}
+    steps:
+      - name: 設定状況の確認
+        run: |
+          if [ "$HAS_TOKEN" != "true" ]; then
+            {
+              echo "## Vercel デプロイはスキップしました"
+              echo ""
+              echo "リポジトリの **Settings → Secrets and variables → Actions** に次を登録すると、"
+              echo "以降の push で自動デプロイされます。"
+              echo ""
+              echo "| シークレット | 必須 | 取得場所 |"
+              echo "| --- | --- | --- |"
+              echo "| \`VERCEL_TOKEN\` | 必須 | https://vercel.com/account/tokens |"
+              echo "| \`VERCEL_ORG_ID\` | 任意 | 既存プロジェクトに紐付ける場合のみ（Vercel の Project Settings） |"
+              echo "| \`VERCEL_PROJECT_ID\` | 任意 | 同上。未設定なら新規プロジェクトが自動作成されます |"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/checkout@v4
+        if: env.HAS_TOKEN == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_TOKEN == 'true'
+        with:
+          node-version: 22
+
+      - name: Vercel CLI を導入
+        if: env.HAS_TOKEN == 'true'
+        run: npm i -g vercel@latest
+
+      - name: 本番環境へデプロイ
+        if: env.HAS_TOKEN == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -o pipefail
+          url=$(vercel deploy --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
+          echo "デプロイ先: $url"
+          {
+            echo "## デプロイ完了 🎉"
+            echo ""
+            echo "本番URL: $url"
+          } >> "$GITHUB_STEP_SUMMARY"
