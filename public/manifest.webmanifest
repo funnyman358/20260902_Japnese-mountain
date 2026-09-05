@@ -1,0 +1,22 @@
+{
+  "name": "ヤマコンプ - 日本の山コンプリート手帳",
+  "short_name": "ヤマコンプ",
+  "description": "日本全国の登れる山を記録して、コンプリートを目指す登山記録アプリ",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f3",
+  "theme_color": "#1f8a5b",
+  "lang": "ja",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "山を探す", "url": "/mountains" },
+    { "name": "実績", "url": "/achievements" },
+    { "name": "記録", "url": "/records" }
+  ]
+}

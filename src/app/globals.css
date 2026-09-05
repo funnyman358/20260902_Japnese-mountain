@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic",
+    "Meiryo", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-page: var(--page);
+}
+
+:root {
+  --page: #f4f6f3;
+  --surface: #ffffff;
+  --surface-2: #f0f3ef;
+  --surface-3: #e6ebe3;
+  --line: #dfe4dc;
+  --ink: #16241d;
+  --ink-muted: #4d5f56;
+  --ink-subtle: #7c8b83;
+  --brand: #1f8a5b;
+  --brand-strong: #146b45;
+  --brand-soft: #d9f0e3;
+  --accent: #d98324;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0c1512;
+    --surface: #131f1a;
+    --surface-2: #18261f;
+    --surface-3: #1f3129;
+    --line: #26362e;
+    --ink: #e8f0ea;
+    --ink-muted: #a8bcb0;
+    --ink-subtle: #7d9188;
+    --brand: #3fbe83;
+    --brand-strong: #6fd7a5;
+    --brand-soft: #16352678;
+    --accent: #f0a248;
+    color-scheme: dark;
+  }
+}
+
+html,
+body {
+  background: var(--page);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* iOS のセーフエリア対応（下部ナビ用） */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop {
+  animation: pop-in 0.35s ease-out both;
+}
+
+@keyframes rise {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-rise {
+  animation: rise 0.3s ease-out both;
+}
+
+@keyframes toast-in {
+  from { transform: translateY(20px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.animate-toast {
+  animation: toast-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
