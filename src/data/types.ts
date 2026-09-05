@@ -33,10 +33,7 @@ export const LISTS = [
   "日本二百名山",
   "日本三百名山",
   "花の百名山",
-  "新日本百名山",
-  "日本百高山",
   "都道府県最高峰",
-  "日本三大◯◯",
 ] as const;
 export type MountainList = (typeof LISTS)[number];
 

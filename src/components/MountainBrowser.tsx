@@ -246,7 +246,7 @@ export function MountainBrowser() {
           </FilterGroup>
 
           <FilterGroup title="名山リスト">
-            {LISTS.filter((l) => l !== "日本三大◯◯" && l !== "日本百高山" && l !== "新日本百名山").map((l) => (
+            {LISTS.map((l) => (
               <Toggle key={l} active={lists.includes(l)} onClick={() => { setLists(toggle(lists, l)); setLimit(60); }}>
                 {l}
               </Toggle>

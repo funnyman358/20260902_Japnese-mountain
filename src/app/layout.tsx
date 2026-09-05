@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | ヤマコンプ",
   },
   description:
-    "日本全国の登れる山670座を収録。登った山を記録して、都道府県別・名山リスト別のコンプリートを目指す登山記録アプリ。スマホとPCでデータを同期できます。",
+    "日本全国の登れる山674座を収録。登った山を記録して、都道府県別・名山リスト別のコンプリートを目指す登山記録アプリ。スマホとPCでデータを同期できます。",
   manifest: "/manifest.webmanifest",
   applicationName: "ヤマコンプ",
   appleWebApp: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "ヤマコンプ",
     title: "ヤマコンプ | 日本の山コンプリート手帳",
     description:
-      "日本全国の登れる山670座を収録。登った山を記録して、都道府県別・名山リスト別のコンプリートを目指す登山記録アプリ。",
+      "日本全国の登れる山674座を収録。登った山を記録して、都道府県別・名山リスト別のコンプリートを目指す登山記録アプリ。",
     images: ["/icon-512.png"],
     locale: "ja_JP",
   },
