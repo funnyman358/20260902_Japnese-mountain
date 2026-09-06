@@ -62,6 +62,14 @@ jobs:
         with:
           node-version: 22
 
+      - name: 依存関係を導入
+        if: env.HAS_TOKEN == 'true'
+        run: npm ci
+
+      - name: 静的サイトを書き出し
+        if: env.HAS_TOKEN == 'true'
+        run: npm run build
+
       - name: Vercel CLI を導入
         if: env.HAS_TOKEN == 'true'
         run: npm i -g vercel@latest
@@ -82,7 +90,17 @@ jobs:
             vercel project add "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
             vercel link --yes --project "$PROJECT_NAME" --token="$VERCEL_TOKEN"
           fi
-          url=$(vercel deploy --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
+          # link が生成する .env.local はビルド済みなので不要
+          rm -f .env.local
+
+          # Next.js の静的エクスポート結果をそのまま配信する（Build Output API v3）。
+          # ホスティング側のフレームワーク検出に依存しないため確実に配信できる。
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+          cp -r out/. .vercel/output/static/
+          printf '{"version":3,"trailingSlash":true}' > .vercel/output/config.json
+
+          url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
           echo "デプロイ先: $url"
           echo "DEPLOY_URL=$url" >> "$GITHUB_ENV"
 
