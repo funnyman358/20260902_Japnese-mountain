@@ -100,7 +100,20 @@ jobs:
           cp -r out/. .vercel/output/static/
           printf '{"version":3,"trailingSlash":true}' > .vercel/output/config.json
 
-          url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
+          # 約2,000ファイルを送るため、まれにアップロードが中断する。数回まで再試行する。
+          url=""
+          for attempt in 1 2 3; do
+            if url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" | tail -n 1) && [ -n "$url" ]; then
+              break
+            fi
+            echo "アップロードに失敗しました。再試行します（$attempt 回目）"
+            url=""
+            sleep 15
+          done
+          if [ -z "$url" ]; then
+            echo "3回試しましたがデプロイできませんでした"
+            exit 1
+          fi
           echo "デプロイ先: $url"
           echo "DEPLOY_URL=$url" >> "$GITHUB_ENV"
 
