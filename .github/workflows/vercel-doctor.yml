@@ -17,35 +17,44 @@ jobs:
           node-version: 22
       - run: npm i -g vercel@latest
 
-      - name: whoami / scope
-        run: vercel whoami --token="$VERCEL_TOKEN" || true
-
-      - name: プロジェクト一覧
-        run: vercel project ls --token="$VERCEL_TOKEN" || true
-
       - name: プロジェクトにリンク
-        run: vercel link --yes --project "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
+        run: vercel link --yes --project "$PROJECT_NAME" --token="$VERCEL_TOKEN"
 
       - name: デプロイ一覧
         run: vercel ls "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
 
-      - name: 本番デプロイの詳細
+      - name: 現在の本番URLを各パスで確認
         run: |
-          vercel inspect "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" --token="$VERCEL_TOKEN" || true
-
-      - name: 本番デプロイのビルドログ
-        run: |
-          vercel inspect "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" --logs --token="$VERCEL_TOKEN" 2>&1 | tail -n 60 || true
-
-      - name: エイリアス一覧
-        run: vercel alias ls --token="$VERCEL_TOKEN" || true
-
-      - name: HTTP 応答を確認
-        run: |
-          for u in \
-            "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" \
-            "https://yamacomp-arigatou358358358-9171s-projects.vercel.app" \
-            "https://yamacomp.vercel.app"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "$u" || echo "ERR")
-            echo "$code  $u"
+          base="https://${PROJECT_NAME}-arigatou358358358-9171s-projects.vercel.app"
+          for path in "/" "/mountains" "/icon.svg" "/manifest.webmanifest"; do
+            echo "=== $base$path"
+            curl -s -o /dev/null -D - -w "" "$base$path" | grep -Ei "^(HTTP|x-vercel|content-type|location)" || true
           done
+
+      - name: prebuilt 方式で再デプロイ
+        id: prebuilt
+        run: |
+          set -o pipefail
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          echo "--- .vercel/project.json ---"
+          cat .vercel/project.json || true
+          vercel build --prod --token="$VERCEL_TOKEN"
+          echo "--- ビルド成果物 ---"
+          ls -la .vercel/output || true
+          echo "--- config.json ---"
+          cat .vercel/output/config.json || true
+          echo "--- static 直下 ---"
+          ls .vercel/output/static | head -20 || true
+          url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
+          echo "PREBUILT_URL=$url" >> "$GITHUB_ENV"
+          echo "新URL: $url"
+
+      - name: 再デプロイ後の応答
+        run: |
+          for path in "/" "/mountains"; do
+            echo "=== ${PREBUILT_URL}${path}"
+            curl -s -o /tmp/b.html -D - -w "" "${PREBUILT_URL}${path}" | grep -Ei "^(HTTP|x-vercel|content-type)" || true
+            head -c 200 /tmp/b.html; echo
+          done
+          echo "=== 固定URL"
+          curl -s -o /dev/null -w "%{http_code}\n" "https://${PROJECT_NAME}-arigatou358358358-9171s-projects.vercel.app/"
