@@ -100,15 +100,16 @@ jobs:
           cp -r out/. .vercel/output/static/
           printf '{"version":3,"trailingSlash":true}' > .vercel/output/config.json
 
-          # 約2,000ファイルを送るため、まれにアップロードが中断する。数回まで再試行する。
+          # 静的エクスポートは数千個の小さなファイルになる。個別に送ると
+          # アップロードが中断するため、1つのアーカイブにまとめて送る。
           url=""
           for attempt in 1 2 3; do
-            if url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" | tail -n 1) && [ -n "$url" ]; then
+            if url=$(vercel deploy --prebuilt --prod --yes --archive=tgz --token="$VERCEL_TOKEN" | tail -n 1) && [ -n "$url" ]; then
               break
             fi
             echo "アップロードに失敗しました。再試行します（$attempt 回目）"
             url=""
-            sleep 15
+            sleep 20
           done
           if [ -z "$url" ]; then
             echo "3回試しましたがデプロイできませんでした"
