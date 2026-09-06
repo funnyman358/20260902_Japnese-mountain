@@ -72,8 +72,16 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Vercel のプロジェクト名は小文字のみ。リポジトリ名から自動生成すると
+          # 大文字が含まれて弾かれるため、明示的に指定する。
+          PROJECT_NAME: yamacomp
         run: |
           set -o pipefail
+          if [ -z "$VERCEL_PROJECT_ID" ]; then
+            # 既に存在する場合はエラーになるので無視して先へ進む
+            vercel project add "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
+            vercel link --yes --project "$PROJECT_NAME" --token="$VERCEL_TOKEN"
+          fi
           url=$(vercel deploy --prod --yes --token="$VERCEL_TOKEN" | tail -n 1)
           echo "デプロイ先: $url"
           {
