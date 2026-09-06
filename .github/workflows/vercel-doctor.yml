@@ -1,0 +1,51 @@
+name: Vercel Doctor
+
+on:
+  workflow_dispatch:
+
+jobs:
+  doctor:
+    name: Vercel の状態を調べる
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      PROJECT_NAME: yamacomp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm i -g vercel@latest
+
+      - name: whoami / scope
+        run: vercel whoami --token="$VERCEL_TOKEN" || true
+
+      - name: プロジェクト一覧
+        run: vercel project ls --token="$VERCEL_TOKEN" || true
+
+      - name: プロジェクトにリンク
+        run: vercel link --yes --project "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
+
+      - name: デプロイ一覧
+        run: vercel ls "$PROJECT_NAME" --token="$VERCEL_TOKEN" || true
+
+      - name: 本番デプロイの詳細
+        run: |
+          vercel inspect "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" --token="$VERCEL_TOKEN" || true
+
+      - name: 本番デプロイのビルドログ
+        run: |
+          vercel inspect "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" --logs --token="$VERCEL_TOKEN" 2>&1 | tail -n 60 || true
+
+      - name: エイリアス一覧
+        run: vercel alias ls --token="$VERCEL_TOKEN" || true
+
+      - name: HTTP 応答を確認
+        run: |
+          for u in \
+            "https://yamacomp-3bvu2dj3c-arigatou358358358-9171s-projects.vercel.app" \
+            "https://yamacomp-arigatou358358358-9171s-projects.vercel.app" \
+            "https://yamacomp.vercel.app"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$u" || echo "ERR")
+            echo "$code  $u"
+          done
