@@ -5,7 +5,7 @@
 
 スマートフォンでもPCでも使え、「同期キー」を使えば端末間で記録を共有できます。
 
-**本番URL: https://yamacomp.vercel.app**
+**本番URL: https://yamacomp-arigatou358358358-9171s-projects.vercel.app**
 
 ## 主な機能
 
@@ -113,6 +113,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxxx
    ワークフローのサマリーに本番URLが表示されます
 
 `VERCEL_TOKEN` が未設定の間はデプロイ手順だけがスキップされ、検証ジョブは通常どおり成功します。
+デプロイ後は本番URLへ実際にアクセスして 200 が返ることを確認し、返らなければワークフローが失敗します。
+
+なお、このアプリは全ページを事前生成する静的サイト（`output: "export"`）として書き出し、
+その成果物を Build Output API 形式でアップロードしています。
+ホスティング側のフレームワーク検出に依存しないため、確実に配信できます。
 
 ### 方法B: Vercel のダッシュボードから取り込む
 
